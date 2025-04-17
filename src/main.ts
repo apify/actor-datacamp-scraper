@@ -5,19 +5,19 @@
  */
 
 // For more information, see https://docs.apify.com/sdk/js
-import { Actor } from 'apify';
+import { Actor, ProxyConfigurationOptions } from 'apify';
 // For more information, see https://crawlee.dev
 import { PlaywrightCrawler } from 'crawlee';
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
 // note that we need to use `.js` even when inside TS files
-import { router } from './routes.js';
 import { firefox } from 'playwright';
 import { launchOptions as camoufoxLaunchOptions } from 'camoufox-js';
+import { router } from './routes.js';
 
 interface Input {
-    startUrls: string[];
     maxRequestsPerCrawl: number;
+    proxyConfig: ProxyConfigurationOptions,
 }
 
 // Initialize the Apify SDK
@@ -25,11 +25,11 @@ await Actor.init();
 
 // Structure of input is defined in input_schema.json
 const {
-    startUrls = ['https://apify.com'],
+    proxyConfig = { useApifyProxy: true },
     maxRequestsPerCrawl = 100,
 } = await Actor.getInput<Input>() ?? {} as Input;
 
-const proxyConfiguration = await Actor.createProxyConfiguration();
+const proxyConfiguration = await Actor.createProxyConfiguration(proxyConfig);
 
 const crawler = new PlaywrightCrawler({
     proxyConfiguration,
@@ -41,10 +41,12 @@ const crawler = new PlaywrightCrawler({
             headless: true,
             // fonts: ['Times New Roman'] // <- custom Camoufox options
         }),
-    }
+    },
 });
 
-await crawler.run(startUrls);
+await crawler.run([
+    { url: 'https://www.datacamp.com/courses-all', label: 'list' },
+]);
 
 // Exit successfully
 await Actor.exit();

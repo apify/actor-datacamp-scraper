@@ -3,16 +3,12 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "startUrls": {
-            "title": "Start URLs",
-            "type": "array",
-            "description": "URLs to start with.",
-            "editor": "requestListSources",
-            "prefill": [
-                {
-                    "url": "https://apify.com"
-                }
-            ]
+        "proxyConfig": {
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Select proxies to be used by your crawler.",
+            "prefill": { "useApifyProxy": true },
+            "editor": "proxy"
         },
         "maxRequestsPerCrawl": {
             "title": "Max Requests per Crawl",
